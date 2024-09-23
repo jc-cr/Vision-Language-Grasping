@@ -16,52 +16,13 @@ Any question, please let me know: kcxu@zju.edu.cn
 ## Setup
 ###  Installation
 
-- Ubuntu 18.04
-- Torch 1.7.1, Torchvision 0.8.2
-- Pybullet (simulation environment)
-- Cuda 11.1
-- GTX 3060, 12GB memory is tested
+This installation has been modified to work with docker. The following steps are required to run the code:
 
-```
-git clone git@github.com:xukechun/Vision-Language-Grasping.git
-cd Vision-Language-Grasping
+1. Build the vilg docker image. The docker-compose file is provided but was setup to work with Nvidia GPUs compatible with CUDA 11.1. `docker-compose build vilg`
 
-conda create -n vilg python=3.8
-conda activate vilg
+The container can now be run with `docker-compose up vilg`. 
 
-pip install -r requirements.txt
-
-python setup.py develop
-
-cd models/graspnet/pointnet2
-python setup.py install
-
-cd ../knn
-python setup.py install
-```
-
-###  Potential Issues of Installation
-- When installing graspnetAPI, the following problem might occur:
-```
-× python setup.py egg_info did not run successfully.
-│ exit code: 1
-╰─> [18 lines of output]
-The 'sklearn' PyPI package is deprecated, use 'scikit-learn'
-rather than 'sklearn' for pip commands.
-```
-solution:
-```
-export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
-```
-- Check the compatible version of torch and torchvision of your machine (especially the cuda vision) if the following problem occurs:
-```
-RuntimeError: CUDA error: no kernel image is available for execution on the device
-```
-solution: to install torch with the right cuda version, e.g.
-```
-# CUDA 11.0
-pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 -f https://download.pytorch.org/whl/torch_stable.html
-```
+To run a specific script such as training or testing, update the `docker-compose.yml` in the `command` section to the desired script. 
 
 ### Assets
 We provide the processed object models in this [link](https://drive.google.com/drive/folders/1WxKDFXJktoqiP0jmkDZrMCcNNBx5u-YM?usp=drive_link). Please download the file and unzip it in the `assets` folder.
