@@ -7,7 +7,6 @@ import copy
 from models.graspnet.graspnet_baseline import GraspNetBaseLine
 from utils import graspnet_config
 
-
 # Modified from https://github.com/OCRTOC/OCRTOC_software_package/blob/master/ocrtoc_perception/src/ocrtoc_perception/perceptor.py
 class Graspnet:
     def __init__(self):
@@ -19,7 +18,7 @@ class Graspnet:
         grasp_pcd = copy.deepcopy(full_pcd)
         grasp_pcd.points = o3d.utility.Vector3dVector(-points)
 
-        # generating grasp poses.
+        # generating grasp poses
         gg = self.graspnet_baseline.inference(grasp_pcd)
         gg.translations = -gg.translations
         gg.rotation_matrices = -gg.rotation_matrices
@@ -69,6 +68,7 @@ class Graspnet:
         # first round to find the object that each grasp belongs to.
         angle_mask = (rs[:, 2, 0] < -np.cos(angle_thresh / 180.0 * np.pi))
         for i, object_name in enumerate(object_poses.keys()):
+            print("Object name:", object_name)
             object_pose = object_poses[object_name]
 
             dists = np.linalg.norm(ts - object_pose[:3,3], axis=1)
@@ -147,7 +147,8 @@ class Graspnet:
         # visualization
         # frame = o3d.geometry.TriangleMesh.create_coordinate_frame(0.1)
         # o3d.visualization.draw_geometries([frame, full_pcd, *gg.to_open3d_geometry_list()])
+        # print("\nVisualization of grasp poses")
+
+        print("\nGrasp_pose_dict:", grasp_pose_dict)
 
         return grasp_pose_set, grasp_pose_dict, remain_gg
-
-

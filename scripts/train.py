@@ -82,10 +82,13 @@ if __name__ == "__main__":
     env = Environment(gui=True)
     env.seed(args.seed)
     # env_sim = Environment(gui=False)
+
     # load logger
     logger = Logger()
+
     # load graspnet
     graspnet = Graspnet()
+
     # load vision-language-action model
     agent = ViLG(grasp_dim=7, args=args)
     if args.load_model:
@@ -110,7 +113,7 @@ if __name__ == "__main__":
             # env_sim.reset()
             lang_goal = env.generate_lang_goal()
             if episode < 500:
-                warmup_num_obj = 8
+                warmup_num_obj = 6
                 reset = env.add_objects(warmup_num_obj, WORKSPACE_LIMITS)
             else:
                 reset = env.add_objects(num_obj, WORKSPACE_LIMITS)
@@ -128,12 +131,13 @@ if __name__ == "__main__":
                 print("\033[031m Target objects are not in the scene!\033[0m")
                 break     
 
-            if episode_steps == 0:
+            if episode_steps == 0: #First step
                 color_image, depth_image, mask_image = utils.get_true_heightmap(env)
                 bbox_images, bbox_positions = utils.get_true_bboxs(env, color_image, depth_image, mask_image)
 
                 # graspnet
                 pcd = utils.get_fuse_pointcloud(env)
+
                 # Note that the object poses here can be replaced by the bbox 3D positions with identity rotations
                 with torch.no_grad():
                     grasp_pose_set, _, _ = graspnet.grasp_detection(pcd, env.get_true_object_poses())
@@ -213,7 +217,6 @@ if __name__ == "__main__":
             grasps = next_grasps
             grasp_pose_set = next_grasp_pose_set
 
-        
         if (episode + 1) % args.save_model_interval == 0:
             logger.save_checkpoint(agent, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"), str(episode))
         logger.episode_reward_logs.append(episode_reward)

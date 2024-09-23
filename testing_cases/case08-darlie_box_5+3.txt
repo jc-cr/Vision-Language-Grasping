@@ -1,0 +1,10 @@
+give me the darlie box
+5 6 7 0 1 2 3 4
+assets/simplified_objects/058.urdf 0.5 -0.2 0.1 0 0 -1.57
+assets/simplified_objects/058.urdf 0.5 -0.1 0.1 0 0 -1.57
+assets/simplified_objects/058.urdf 0.5 0 0.1 0 0 -1.57
+assets/simplified_objects/058.urdf 0.5 0.1 0.1 0 0 -1.57
+assets/simplified_objects/058.urdf 0.5 0.2 0.1 0 0 -1.57
+assets/simplified_objects/058.urdf 0.45 0 0.2 0 0 0
+assets/simplified_objects/058.urdf 0.5 0 0.2 0 0 0
+assets/simplified_objects/058.urdf 0.6 0 0.2 0 0 0

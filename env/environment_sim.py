@@ -1,5 +1,5 @@
 import time
-import glob
+import glob, os
 import pybullet as pb
 import pybullet_data
 import numpy as np
@@ -352,7 +352,9 @@ class Environment:
             else:
                 if grasped_obj_id in self.target_obj_ids:
                     reward = 2
-                    done = True
+                    self.target_obj_ids.remove(grasped_obj_id)
+                    if len(self.target_obj_ids) == 0:
+                        done = True
                 else:
                     max_pos_dist = np.sqrt((WORKSPACE_LIMITS[0][1]-WORKSPACE_LIMITS[0][0]) ** 2 + (WORKSPACE_LIMITS[1][1]-WORKSPACE_LIMITS[1][0]) ** 2)
                     reward = - pos_dist / max_pos_dist
@@ -447,6 +449,13 @@ class Environment:
         body_ids = []
         self.target_obj_ids = []
 
+        # Define the directory and file path
+        directory = "cases/"
+        file_path = os.path.join(directory, "temp.txt")
+
+        # Create the directory if it doesn't exist
+        os.makedirs(directory, exist_ok=True)
+
         with open("cases/" + "temp.txt", "w") as out_file:
             out_file.write("%s\n" % self.lang_goal)
             # add target objects
@@ -467,6 +476,7 @@ class Environment:
                     2 * np.pi * np.random.random_sample(),
                     2 * np.pi * np.random.random_sample(),
                 ]
+                print("\ntarget_objects:",target_mesh_file)
                 body_id = pb.loadURDF(
                     target_mesh_file, object_position, pb.getQuaternionFromEuler(object_orientation)
                 )
@@ -508,6 +518,7 @@ class Environment:
                     2 * np.pi * np.random.random_sample(),
                     2 * np.pi * np.random.random_sample(),
                 ]
+                print("\nother objects:",curr_mesh_file)
                 body_id = pb.loadURDF(
                     curr_mesh_file, object_position, pb.getQuaternionFromEuler(object_orientation)
                 )
@@ -575,6 +586,7 @@ class Environment:
                 obj_orientations[object_idx][1],
                 obj_orientations[object_idx][2],
             ]
+            print("\nImport objects:",curr_mesh_file, "position:", object_position)
             body_id = pb.loadURDF(
                 curr_mesh_file,
                 object_position,
@@ -617,6 +629,7 @@ class Environment:
     def move_joints(self, target_joints, speed=0.01, timeout=3):
         """Move UR5e to target joint configuration."""
         t0 = time.time()
+        # print("move_joints: target_joints=",target_joints)
         while (time.time() - t0) < timeout:
             current_joints = np.array(
                 [
@@ -647,6 +660,7 @@ class Environment:
                 targetPositions=step_joints,
                 positionGains=np.ones(len(self.ur5e_joints)),
             )
+            # print("Move joints to", step_joints)
             pb.stepSimulation()
         print(f"Warning: move_joints exceeded {timeout} second timeout. Skipping.")
         return False
@@ -708,7 +722,6 @@ class Environment:
         Returns:
             success: robot movement success if True.
         """
-
         # Handle unexpected behavior
         pb.changeDynamics(
             self.ee, self.ee_finger_pad_id, lateralFriction=0.9, spinningFriction=0.1
@@ -717,6 +730,7 @@ class Environment:
         pose = np.array(pose, dtype=np.float32)
         rot = pose[-4:]
         pos = pose[:3]
+        print("\nPose:",pose,"rot:",rot,"pos:",pos)
         transform = np.eye(4)
         transform[:3, :3] = R.from_quat(rot).as_matrix()
         transform[:3, 3] = pos
@@ -732,21 +746,27 @@ class Environment:
 
         pos = (ee_transform[:3, 3]).T
         pos[2] = max(pos[2] - 0.02, self.bounds[2][0])
-        over = np.array((pos[0], pos[1], pos[2] + 0.2))
+        over = np.array((pos[0], pos[1], pos[2] + 0.2)) #20 cm overhead the target object
         rot = R.from_matrix(ee_transform[:3, :3]).as_quat()
 
         # Execute 6-dof grasping.
         grasped_obj_id = None
         min_pos_dist = None
         self.open_gripper()
+        input("Gripper opened")
         success = self.move_joints(self.ik_rest_joints)
+        input("move_joints() to fixed ik_rest_joints")
         if success:
-            success = self.move_ee_pose((over, rot), speed)
+            success = self.move_ee_pose((over, rot), speed) #
+        input("move_ee_pose() to over position")
         if success:
             success = self.straight_move(over, pos, rot, speed, detect_force=True)
+        input("straight_move() down to reach the object, from over to pos position")
         if success:
             self.close_gripper()
+            input("close_gripper")
             success = self.straight_move(pos, over, rot, speed)
+            input("straight_move() up to lift the object, from pos to over position")
             success &= self.is_gripper_closed
             
             if success: # get grasp object id
@@ -757,15 +777,20 @@ class Environment:
                         grasped_obj_id = i
                         max_height = height
                 pos_dists = []
+                print("Grasped object#",grasped_obj_id,"Target objects are",self.target_obj_ids)
                 for target_obj_id in self.target_obj_ids:
                     pos_dist = np.linalg.norm(np.array(self.info[grasped_obj_id][0]) - np.array(self.info[target_obj_id][0]))
                     pos_dists.append(pos_dist)
                 min_pos_dist = min(pos_dists)
 
         if success:
-            success = self.move_joints(self.drop_joints1)
+            success = self.move_joints(self.drop_joints1, speed=0.005)
+            input("move to drop position with speed=0.005")
+
             # success &= self.is_gripper_closed
             self.open_gripper(is_slow=True)
+            input("target dropped")
+
         self.go_home()
 
         print(f"Grasp at {pose}, the grasp {success}")

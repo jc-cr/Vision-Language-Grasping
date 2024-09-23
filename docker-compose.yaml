@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  vilg-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.vilg
+      target: final
+    image: vision-language-grasping-final
+    container_name: vilg-app
+    volumes:
+      - ./:/app
+      - ./assets:/app/assets
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=${DISPLAY}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: python3 scripts/test.py --load_model --model_path '/app/trained_model.pth'
+
+  pip-compile:
+    build:
+      context: .
+      dockerfile: Dockerfile.pip-compile
+    volumes:
+      - ./:/app
+      - ./:/output
+    environment:
+      - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True

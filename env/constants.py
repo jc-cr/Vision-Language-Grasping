@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-WORKSPACE_LIMITS = np.asarray([[0.276, 0.724], [-0.224, 0.224], [-0.0001, 0.4]])
+WORKSPACE_LIMITS = np.asarray([[0.138, 1.448], [-0.448, 0.448], [-0.0001, 0.4]])
 
 # task
 LANG_TEMPLATES = ["give me the {keyword}", # label

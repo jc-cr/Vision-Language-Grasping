@@ -5,7 +5,6 @@ import torch.distributions as td
 from torch.optim import Adam
 from models.networks import CLIPGraspFusion, QNetwork, Policy
 
-
 class ViLG(object):
     def __init__(self, grasp_dim, args):
 
@@ -23,7 +22,6 @@ class ViLG(object):
         # policy
         self.policy = Policy(args.width, args.hidden_size).to(self.device)
         self.policy_optim = Adam(self.policy.parameters(), lr=args.lr)
-
 
         if not args.evaluate:
             # SAC parameters
@@ -65,9 +63,9 @@ class ViLG(object):
 
 
     def select_action(self, bboxes, pos_bboxes, text, actions, evaluate=False):
-        sa, clip_probs, vig_attn = self.get_fusion_feature(bboxes, pos_bboxes, text, actions)
-        logits = self.policy(sa)
-        if sa.shape[0] == 1:
+        vilg_feature, clip_probs, vig_attn = self.get_fusion_feature(bboxes, pos_bboxes, text, actions)
+        logits = self.policy(vilg_feature)
+        if vilg_feature.shape[0] == 1:
             logits = logits.unsqueeze(0)
         if actions.shape[1] == 1:
             logits = logits.unsqueeze(0)
@@ -76,6 +74,8 @@ class ViLG(object):
         pi = cate_dist.sample()  # [B,]
 
         action = pi if not evaluate else mu
+
+        print("Evaluate:",evaluate) if not evaluate else print("Evaluate2:",evaluate)
 
         return logits.detach().cpu().numpy(), action.detach().cpu().numpy()[0], clip_probs.detach().cpu().numpy(), vig_attn.detach().cpu().numpy()[0]
 

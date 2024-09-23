@@ -74,7 +74,6 @@ def get_embedder(multires, input_dim=3):
     embedder_obj = Embedder(**embed_kwargs)
     return embedder_obj, embedder_obj.out_dim
 
-    
 class PositionEmbeddingSine(nn.Module):
     """
     This is a more standard version of the position embedding, very similar to the one
@@ -227,7 +226,6 @@ class CLIPGraspFusion(nn.Module):
                                 nn.Linear(width, width)
                                 )
                             
-
     def _load_clip(self): # patch_size = 32, vision_width = 768, vision_layers = 12, vision_heads = 12, output_dim = 512, vocab_size = 49408
         model, _ = load_clip("ViT-B/32", device=self.device)
         self.clip = build_model(model.state_dict()).to(self.device)
@@ -265,7 +263,6 @@ class CLIPGraspFusion(nn.Module):
         return fusion_feat
     
     def forward(self, bboxes, pos_bboxes, text, actions):
-
         # encode bbox
         bbox_feat = self.encode_bbox(bboxes) # shape = [N, L, D] D=512
         # encode text
@@ -304,7 +301,6 @@ class CLIPGraspFusion(nn.Module):
         cross_feat, attn_weights = self.cross_attn(q=grasp_feat, k=bbox_compound_feat, v=fusion_feat) # shape = [N, L', D]
         
         return cross_feat, probs, attn_weights
-
 
 # Initialize Policy weights
 def weights_init_(m):

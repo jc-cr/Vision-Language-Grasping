@@ -20,14 +20,14 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=1234, metavar='N',
                     help='random seed (default: 1234)')
     parser.add_argument('--evaluate', dest='evaluate', action='store_false', default=True)
-    parser.add_argument('--testing_case_dir', action='store', type=str, default='testing_cases/')
+    parser.add_argument('--testing_case_dir', action='store', type=str, default='testing_cases_5/')
     parser.add_argument('--testing_case', action='store', type=str, default=None)
 
     parser.add_argument('--load_model', dest='load_model', action='store_true', default=False)
     parser.add_argument('--model_path', action='store', type=str, default='')
 
     parser.add_argument('--num_episode', action='store', type=int, default=15)
-    parser.add_argument('--max_episode_step', type=int, default=8)
+    parser.add_argument('--max_episode_step', type=int, default=16)
 
     # Transformer paras
     parser.add_argument('--patch_size', type=int, default=32)
@@ -68,13 +68,17 @@ if __name__ == "__main__":
     # load vision-language-action model
     agent = ViLG(grasp_dim=7, args=args)
     if args.load_model:
+        # print("\nmodel_path:",args.model_path)
         logger.load_checkpoint(agent, args.model_path, args.evaluate)
         
     if os.path.exists(args.testing_case_dir):
         filelist = os.listdir(args.testing_case_dir)
+        # print("filelist:", filelist)
+
         filelist.sort(key=lambda x:int(x[4:6]))
     if args.testing_case != None:
         filelist = [args.testing_case]
+    print("filelist:", filelist)
     case = 0
     iteration = 0
     for f in filelist:
@@ -83,6 +87,7 @@ if __name__ == "__main__":
         logger.episode_reward_logs = []
         logger.episode_step_logs = []
         logger.episode_success_logs = []
+
         for episode in range(num_episode):
             episode_reward = 0
             episode_steps = 0
@@ -105,7 +110,6 @@ if __name__ == "__main__":
                 if len(out_of_workspace) == len(env.target_obj_ids):
                     print("\033[031m Target objects are not in the scene!\033[0m")
                     break     
-
 
                 color_image, depth_image, mask_image = utils.get_true_heightmap(env)
 
@@ -133,6 +137,8 @@ if __name__ == "__main__":
                         logits, action_idx, clip_probs, vig_attn = agent.select_action(bboxes, pos_bboxes, lang_goal, grasps, evaluate=args.evaluate)
 
                 action = grasp_pose_set[action_idx]
+                # print("\nAction:",action)
+
                 reward, done = env.step(action)
                 iteration += 1
                 episode_steps += 1
@@ -141,7 +147,6 @@ if __name__ == "__main__":
 
                 if episode_steps == args.max_episode_step:
                     break
-
             
             logger.episode_reward_logs.append(episode_reward)
             logger.episode_step_logs.append(episode_steps)
