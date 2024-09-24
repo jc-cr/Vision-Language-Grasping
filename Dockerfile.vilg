@@ -86,6 +86,10 @@ RUN cd /app/models/graspnet/pointnet2 && \
 # Copy the built _ext module to the correct location
 RUN cp /app/models/graspnet/pointnet2/build/lib.linux-x86_64-cpython-38/pointnet2/_ext.cpython-38-x86_64-linux-gnu.so /app/models/graspnet/pointnet2/
 
+# Ensure the _ext module is in the correct location
+RUN mkdir -p /app/models/graspnet/pointnet2/build/lib.linux-x86_64-cpython-38/pointnet2 && \
+    cp /app/models/graspnet/pointnet2/_ext*.so /app/models/graspnet/pointnet2/build/lib.linux-x86_64-cpython-38/pointnet2/
+
 # Install knn
 RUN cd /app/models/graspnet/knn && \
     python setup.py install
