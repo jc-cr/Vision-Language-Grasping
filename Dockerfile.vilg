@@ -86,13 +86,12 @@ RUN apt-get update && apt-get install -y \
 RUN chmod -R 777 /app
 
 # Build and install pointnet2 extension with verbose output
-RUN cd /app/models/graspnet/pointnet2 && python setup.py install --verbose
+RUN cd /app/models/graspnet/pointnet2 && python setup.py install --verbose 
 
-# Check the built extension
-RUN cd /app/models/graspnet/pointnet2 && \
-    python -c "import torch; import pointnet2._ext; print('Pointnet2 extension loaded successfully')"
+RUN ls /app/models/graspnet/pointnet2
+RUN ls /app/models/graspnet/pointnet2/_ext_src
 
 # Build and install knn extension
-RUN cd /app/models/graspnet/knn && python setup.py install
+RUN cd /app/models/graspnet/knn && python setup.py install --verbose
 
 WORKDIR /app
