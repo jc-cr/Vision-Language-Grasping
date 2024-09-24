@@ -65,26 +65,27 @@ WORKDIR /app
 # Set up CUDA environment variables
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
-ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib/python3.8/dist-packages/torch/lib"
 
-# Install additional CUDA libraries
 RUN apt-get update && apt-get install -y \
-    cuda-cudart-dev-11-1 \
-    cuda-libraries-dev-11-1 \
-    cuda-nvcc-11-1 \
-    cuda-nvml-dev-11-1 \
-    cuda-command-line-tools-11-1 \
-    cuda-nvprof-11-1 \
+    cuda-cudart-11-1 \
+    cuda-libraries-11-1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set permissions for the entire app directory
+RUN python -c "import torch; print(torch.__version__)"
+RUN python -c "import torch; print(torch.cuda.is_available())"
+
 RUN chmod -R 777 /app
 
-# Build and install pointnet2 extension with verbose output
 RUN cd /app/models/graspnet/pointnet2 && python setup.py install --verbose 
 
-# Verify the installation by importing the package  import pointnet2._ext as _ext
-RUN python -c "import pointnet2._ext as _ext ; print(_ext)"
+RUN ls -l /app/models/graspnet/pointnet2/build
+RUN ls -l /app/models/graspnet/pointnet2/build/lib*
+
+RUN ldconfig -p | grep libc10.so
+RUN find / -name "libc10.so" 2>/dev/null
+
+RUN python -c "import sys; import pointnet2._ext as _ext; print(_ext); print(sys.path); print(sys.modules.keys())" || (echo "Import failed. Error trace:" && python -c "import traceback; import pointnet2._ext as _ext" 2>&1 | tee /tmp/error.log && cat /tmp/error.log)
 
 # Build and install knn extension
 RUN cd /app/models/graspnet/knn && python setup.py install --verbose
