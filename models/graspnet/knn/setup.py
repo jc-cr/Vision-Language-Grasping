@@ -1,17 +1,11 @@
-#!/usr/bin/env python
-
 import glob
 import os
 
 import torch
-from setuptools import find_packages
-from setuptools import setup
-from torch.utils.cpp_extension import CUDA_HOME
-from torch.utils.cpp_extension import CppExtension
-from torch.utils.cpp_extension import CUDAExtension
+from setuptools import find_packages, setup
+from torch.utils.cpp_extension import CUDA_HOME, CppExtension, CUDAExtension
 
 requirements = ["torch", "torchvision"]
-
 
 def get_extensions():
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -54,13 +48,13 @@ def get_extensions():
 
     return ext_modules
 
-
 setup(
     name="knn_pytorch",
     version="0.1",
     author="foolyc",
     url="https://github.com/foolyc/torchKNN",
     description="KNN implement in Pytorch 1.0 including both cpu version and gpu version",
+    packages=find_packages(exclude=('src',)),
     ext_modules=get_extensions(),
-    cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
+    cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension.with_options(use_ninja=False)},
 )
