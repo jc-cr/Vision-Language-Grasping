@@ -24,7 +24,14 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    command: sh -c "cd /app && python3 scripts/test.py"
+    command: >
+      sh -c "
+      echo 'Python version:' && python --version &&
+      echo 'Pip list:' && pip list &&
+      echo 'PYTHONPATH:' && echo $$PYTHONPATH &&
+      echo 'Contents of /app/models/graspnet/pointnet2:' && ls -R /app/models/graspnet/pointnet2 &&
+      echo 'Running test.py:' && python3 scripts/test.py
+      "
 
   pip-compile:
     build:

@@ -82,6 +82,9 @@ RUN if [ -d "/app/models/graspnet/pointnet2/_ext_src/src" ]; then \
         find /app/models/graspnet/pointnet2/_ext_src/src -name "*.h" -exec cp {} /app/models/graspnet/pointnet2/_ext_src/include/ \; ; \
     fi
 
+# Debugging: List contents of pointnet2 directory
+RUN ls -R /app/models/graspnet/pointnet2
+
 # Compile pointnet2 extensions
 RUN cd /app/models/graspnet/pointnet2 && \
     if [ -f "setup.py" ]; then \
@@ -89,6 +92,9 @@ RUN cd /app/models/graspnet/pointnet2 && \
     else \
         echo "setup.py not found in pointnet2 directory"; \
     fi
+
+# Debugging: List contents after compilation
+RUN ls -R /app/models/graspnet/pointnet2
 
 # Create necessary directories and set permissions for knn
 RUN mkdir -p /app/models/graspnet/knn/knn_pytorch && \
@@ -102,4 +108,14 @@ RUN cd /app/models/graspnet/knn && \
         echo "setup.py not found in knn directory"; \
     fi
 
+# Debugging: List contents of knn directory
+RUN ls -R /app/models/graspnet/knn
+
+# Install the local packages
+RUN pip install -e /app/models/graspnet/pointnet2
+RUN pip install -e /app/models/graspnet/knn
+
 WORKDIR /app
+
+# Final debugging: List installed packages
+RUN pip list
