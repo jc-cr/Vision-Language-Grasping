@@ -72,8 +72,26 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
-# Build and install pointnet2 extension
-RUN cd /app/models/graspnet/pointnet2 && python setup.py install
+# Install additional CUDA libraries
+RUN apt-get update && apt-get install -y \
+    cuda-cudart-dev-11-1 \
+    cuda-libraries-dev-11-1 \
+    cuda-nvcc-11-1 \
+    cuda-nvml-dev-11-1 \
+    cuda-command-line-tools-11-1 \
+    cuda-nvprof-11-1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build and install pointnet2 extension with verbose output
+RUN cd /app/models/graspnet/pointnet2 && \
+    python setup.py build_ext --inplace -v && \
+    python setup.py install -v
+
+# Check the built extension
+RUN cd /app/models/graspnet/pointnet2 && \
+    python -c "import torch; import pointnet2._ext; print('Pointnet2 extension loaded successfully')"
+
+# Build and install knn extension
 RUN cd /app/models/graspnet/knn && python setup.py install
 
 WORKDIR /app
