@@ -33,5 +33,7 @@ setup(
     ],
     cmdclass={
         'build_ext': BuildExtension.with_options(use_ninja=False)
-    }
+    },
+    package_data={'pointnet2': ['*.so']},
+    include_package_data=True,
 )

@@ -72,9 +72,13 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
-# Create include directory and copy header files if they exist
+# Create necessary directories and set permissions
 RUN mkdir -p /app/models/graspnet/pointnet2/_ext_src/include && \
-    if [ -d "/app/models/graspnet/pointnet2/_ext_src/src" ]; then \
+    mkdir -p /app/models/graspnet/pointnet2/pointnet2 && \
+    chmod -R 777 /app/models/graspnet/pointnet2
+
+# Copy header files if they exist
+RUN if [ -d "/app/models/graspnet/pointnet2/_ext_src/src" ]; then \
         find /app/models/graspnet/pointnet2/_ext_src/src -name "*.h" -exec cp {} /app/models/graspnet/pointnet2/_ext_src/include/ \; ; \
     fi
 
