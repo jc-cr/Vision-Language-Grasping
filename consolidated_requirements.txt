@@ -7,10 +7,7 @@
 --find-links https://download.pytorch.org/whl/cu111/torch_stable.html
 
 setuptools==58.2.0 \
-    --allow-unsafe
-
-pybullet==3.2.5
-    --allow-unsafe
+pybullet==3.2.5 \
 
 absl-py==2.1.0 \
     --hash=sha256:526a04eadab8b4ee719ce68f204172ead1027549089702d99b9059f129ff1308 \
