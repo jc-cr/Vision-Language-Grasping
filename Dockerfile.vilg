@@ -72,6 +72,12 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
+# Ensure the include directory exists
+RUN mkdir -p /app/models/graspnet/pointnet2/_ext_src/include
+
+# Copy header files to the include directory
+RUN cp /app/models/graspnet/pointnet2/_ext_src/src/*.h /app/models/graspnet/pointnet2/_ext_src/include/
+
 # Compile pointnet2 extensions
 RUN cd /app/models/graspnet/pointnet2 && \
     python3 setup.py build_ext --inplace
