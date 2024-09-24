@@ -72,18 +72,30 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
-# Ensure the include directory exists
-RUN mkdir -p /app/models/graspnet/pointnet2/_ext_src/include
+# Create include directory and copy header files if they exist
+RUN mkdir -p /app/models/graspnet/pointnet2/_ext_src/include && \
+    if [ -d "/app/models/graspnet/pointnet2/_ext_src/src" ]; then \
+        find /app/models/graspnet/pointnet2/_ext_src/src -name "*.h" -exec cp {} /app/models/graspnet/pointnet2/_ext_src/include/ \; ; \
+    fi
 
-# Copy header files to the include directory
-RUN cp /app/models/graspnet/pointnet2/_ext_src/src/*.h /app/models/graspnet/pointnet2/_ext_src/include/
+# List contents of directories for debugging
+RUN echo "Contents of /app/models/graspnet/pointnet2:" && \
+    ls -R /app/models/graspnet/pointnet2
 
 # Compile pointnet2 extensions
 RUN cd /app/models/graspnet/pointnet2 && \
-    python3 setup.py build_ext --inplace
+    if [ -f "setup.py" ]; then \
+        python3 setup.py build_ext --inplace; \
+    else \
+        echo "setup.py not found in pointnet2 directory"; \
+    fi
 
 # Compile knn extensions
 RUN cd /app/models/graspnet/knn && \
-    python3 setup.py build_ext --inplace
+    if [ -f "setup.py" ]; then \
+        python3 setup.py build_ext --inplace; \
+    else \
+        echo "setup.py not found in knn directory"; \
+    fi
 
 WORKDIR /app
