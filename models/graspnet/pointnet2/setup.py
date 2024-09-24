@@ -1,4 +1,3 @@
-# pointnet2/setup.py
 import os
 import glob
 from setuptools import setup
@@ -7,8 +6,10 @@ from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 ROOT = os.path.dirname(os.path.abspath(__file__))
 print("ROOT:", ROOT)
 
-_ext_sources = glob.glob("*.cpp") + glob.glob("*.cu")
-_ext_headers = glob.glob("*.h")
+_ext_src_root = "_ext_src"
+_ext_sources = glob.glob(os.path.join(ROOT, _ext_src_root, "src", "*.cpp")) + \
+               glob.glob(os.path.join(ROOT, _ext_src_root, "src", "*.cu"))
+_ext_headers = glob.glob(os.path.join(ROOT, _ext_src_root, "include", "*.h"))
 
 print("_ext_sources:", _ext_sources)
 print("_ext_headers:", _ext_headers)
@@ -16,11 +17,11 @@ print("_ext_headers:", _ext_headers)
 def get_extensions():
     ext_modules = [
         CUDAExtension(
-            name='_ext',
+            name='pointnet2._ext',
             sources=_ext_sources,
             extra_compile_args={
-                "cxx": ["-O2", "-I{}".format(ROOT)],
-                "nvcc": ["-O2", "-I{}".format(ROOT)],
+                "cxx": ["-O2", "-I{}".format(os.path.join(ROOT, _ext_src_root, "include"))],
+                "nvcc": ["-O2", "-I{}".format(os.path.join(ROOT, _ext_src_root, "include"))],
             },
         )
     ]
