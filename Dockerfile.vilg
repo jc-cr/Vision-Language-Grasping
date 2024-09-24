@@ -47,9 +47,6 @@ WORKDIR /app
 # Copy only the requirements file first to leverage Docker cache
 COPY consolidated_requirements.txt .
 
-# Install setuptools explicitly first
-RUN pip3 install setuptools==58.2.0
-RUN pip install pybullet==3.2.5
 
 # Install pre-compiled requirements
 RUN pip3 install --no-cache-dir -r consolidated_requirements.txt
