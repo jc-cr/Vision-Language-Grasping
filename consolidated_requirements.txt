@@ -6,10 +6,10 @@
 #
 --find-links https://download.pytorch.org/whl/cu111/torch_stable.html
 
-RUN pip3 install setuptools==58.2.0 \
+setuptools==58.2.0 \
     --allow-unsafe
 
-RUN pip install pybullet==3.2.5
+pybullet==3.2.5
     --allow-unsafe
 
 absl-py==2.1.0 \
