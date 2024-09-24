@@ -1,28 +1,50 @@
 # A Joint Modeling of Vision-Language-Action for Target-oriented Grasping in Clutter
-This is the official repository for the paper: A Joint Modeling of **Vi**sion-**L**anguage-Action for Target-oriented **G**rasping in Clutter (ICRA 2023).
 
-[Paper](https://arxiv.org/abs/2302.12610) | [Video](https://www.bilibili.com/video/BV1yh4y1a7Ha/?spm_id_from=333.999.0.0)
+This is a docker setup for the above work.
 
-![introductory video](images/vilg_video.gif)
 
-We focus on the task of language-conditioned grasping in clutter, in which a robot is supposed to grasp the target object based on a language instruction. Previous works separately conduct visual grounding to localize the target object, and generate a grasp for that object. However, these works require object labels or visual attributes for grounding, which calls for handcrafted rules in planner and restricts the range of language instructions. In this paper, we propose to jointly model vision, language and action with object-centric representation. Our method is applicable under more flexible language instructions, and not limited by visual grounding error. Besides, by utilizing the powerful priors from the pre-trained multi-modal model and grasp model, sample efficiency is effectively improved and the sim2real problem is relived without additional data for transfer. A series of experiments carried out in simulation and real world indicate that our method can achieve better task success rate by less times of motion under more flexible language instructions. Moreover, our method is capable of generalizing better to scenarios with unseen objects and language instructions.
+## Setup
 
-![system overview](images/system.png)
+### Requirements
 
+- Docker: [Docker](https://docs.docker.com/get-docker/)
+- Docker Compose: [Docker Compose](https://docs.docker.com/compose/install/)
+- Nvidia Docker: [Nvidia Docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+
+
+###  Installation
+
+This installation has been modified to work with docker. Once built, the docker container can be run with the provided docker-compose file.
+
+To build the docker image, follow the steps below:
+
+1. `docker-compose build vilg` some version may run as `docker compose build vilg`
+
+
+### Running the Docker Container
+
+Once built, any script can be run inside the docker container. Simply update the `command` in the `docker-compose.yml` file to the desired script and run the following command:
+
+1. `docker-compose up vilg` or `docker compose up vilg`
+
+
+If you need to render via X11, you can use the following command:
+
+```bash
+xhost +local:root
+docker-compose run vilg
+```
+
+This will allow the docker container to connect to the X11 server on the host machine and display the GUI.
+
+
+---
+
+## Original README
 #### Contact
 
 Any question, please let me know: kcxu@zju.edu.cn
 
-## Setup
-###  Installation
-
-This installation has been modified to work with docker. The following steps are required to run the code:
-
-1. Build the vilg docker image. The docker-compose file is provided but was setup to work with Nvidia GPUs compatible with CUDA 11.1. `docker-compose build vilg`
-
-The container can now be run with `docker-compose up vilg`. 
-
-To run a specific script such as training or testing, update the `docker-compose.yml` in the `command` section to the desired script. 
 
 ### Assets
 We provide the processed object models in this [link](https://drive.google.com/drive/folders/1WxKDFXJktoqiP0jmkDZrMCcNNBx5u-YM?usp=drive_link). Please download the file and unzip it in the `assets` folder.
@@ -67,4 +89,3 @@ If you find this work useful, please consider citing:
   pages={11597-11604},
   doi={10.1109/ICRA48891.2023.10161041}}
 ```
-
