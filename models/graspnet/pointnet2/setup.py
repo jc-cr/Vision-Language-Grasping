@@ -1,16 +1,10 @@
 # pointnet2/setup.py
-# Copyright (c) Facebook, Inc. and its affiliates.
-# 
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
-
 from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 import glob
 import os
-# Hard code the ROOT path for Docker
-ROOT = "/app/models/graspnet/pointnet2/"
 
+ROOT = os.path.dirname(os.path.abspath(__file__))
 print("ROOT: ", ROOT)
 
 _ext_src_root = "_ext_src"
@@ -19,21 +13,26 @@ _ext_sources = glob.glob("{}/src/*.cpp".format(_ext_src_root)) + glob.glob(
 )
 _ext_headers = glob.glob("{}/include/*".format(_ext_src_root))
 
-setup(
-    name='pointnet2',
-    ext_modules=[
+print("Source files:", _ext_sources)
+print("Header files:", _ext_headers)
+
+def get_extensions():
+    ext_modules = [
         CUDAExtension(
             name='pointnet2._ext',
             sources=_ext_sources,
             extra_compile_args={
-                "cxx": ["-O2", "-I{}".format("{}/{}/include".format(ROOT, _ext_src_root))],
-                "nvcc": ["-O2", "-I{}".format("{}/{}/include".format(ROOT, _ext_src_root))],
+                "cxx": ["-O2", "-I{}".format(os.path.join(ROOT, _ext_src_root, "include"))],
+                "nvcc": ["-O2", "-I{}".format(os.path.join(ROOT, _ext_src_root, "include"))],
             },
         )
-    ],
+    ]
+    return ext_modules
+
+setup(
+    name='pointnet2',
+    ext_modules=get_extensions(),
     cmdclass={
-        'build_ext': BuildExtension
+        'build_ext': BuildExtension.with_options(no_python_abi_suffix=True)
     }
 )
-
-

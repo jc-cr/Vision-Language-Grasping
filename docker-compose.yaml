@@ -30,8 +30,11 @@ services:
       echo 'Pip list:' && pip list &&
       echo 'PYTHONPATH:' && echo $$PYTHONPATH &&
       echo 'Contents of /app/models/graspnet/pointnet2:' && ls -R /app/models/graspnet/pointnet2 &&
-      echo 'Contents of /app/models/graspnet/pointnet2/build:' && ls -R /app/models/graspnet/pointnet2/build &&
+      cd /app/models/graspnet/pointnet2 &&
+      python setup.py build_ext --inplace -v &&
+      python setup.py install -v &&
       python -c 'import pointnet2._ext; print(\"_ext module imported successfully\")' &&
+      cd /app &&
       echo 'Running test.py:' && python3 scripts/test.py
       "
 
