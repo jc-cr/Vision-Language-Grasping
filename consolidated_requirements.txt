@@ -11,7 +11,8 @@ setuptools==58.2.0 \
 
 
 pybullet==3.2.5 \
-    --hash=sha256:0
+    --hash=sha256:3f9c4289f1773b55915f4efb7514b088539d59b4a082465d68ee7caac11355d1
+
 
 absl-py==2.1.0 \
     --hash=sha256:526a04eadab8b4ee719ce68f204172ead1027549089702d99b9059f129ff1308 \
