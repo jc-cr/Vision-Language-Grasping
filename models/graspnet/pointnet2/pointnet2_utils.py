@@ -27,41 +27,34 @@ import sys
 import importlib.util
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-if current_dir not in sys.path:
-    sys.path.append(current_dir)
+build_dir = os.path.join(current_dir, 'build', 'lib.linux-x86_64-cpython-38', 'pointnet2')
+if build_dir not in sys.path:
+    sys.path.append(build_dir)
 
 print(f"Current directory: {current_dir}")
-print(f"Directory contents: {os.listdir(current_dir)}")
+print(f"Build directory: {build_dir}")
+print(f"Build directory contents: {os.listdir(build_dir) if os.path.exists(build_dir) else 'Directory does not exist'}")
 print(f"sys.path: {sys.path}")
 
-try:
-    from pointnet2 import _ext
-    print("Successfully imported pointnet2._ext")
-except ImportError as e:
-    print(f"Error importing pointnet2._ext: {e}")
-    
-    # Try to find the .so file
-    so_files = [f for f in os.listdir(current_dir) if f.endswith('.so')]
-    print(f"Found .so files: {so_files}")
-    
-    if so_files:
-        so_file = so_files[0]
-        so_path = os.path.join(current_dir, so_file)
-        print(f"Trying to load: {so_path}")
-        try:
-            spec = importlib.util.spec_from_file_location("_ext", so_path)
-            _ext = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(_ext)
-            print(f"Successfully loaded {so_file}")
-        except Exception as e:
-            print(f"Failed to load {so_file}: {e}")
-    else:
-        print("No .so files found in the current directory")
-        raise ImportError(
-            "Could not import _ext module.\n"
-            "Please see the setup instructions in the README: "
-            "https://github.com/erikwijmans/Pointnet2_PyTorch/blob/master/README.rst"
-        ) from e
+# Try to load the _ext module directly
+so_file = '_ext.cpython-38-x86_64-linux-gnu.so'
+so_path = os.path.join(build_dir, so_file)
+
+if os.path.exists(so_path):
+    print(f"Loading {so_file} from {so_path}")
+    spec = importlib.util.spec_from_file_location("_ext", so_path)
+    _ext = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(_ext)
+    print("Successfully loaded _ext")
+else:
+    print(f"{so_file} not found in {build_dir}")
+    raise ImportError(
+        "Could not import _ext module.\n"
+        "Please see the setup instructions in the README: "
+        "https://github.com/erikwijmans/Pointnet2_PyTorch/blob/master/README.rst"
+    )
+
+# Rest of your pointnet2_utils.py code...
 
 if False:
     # Workaround for type hints without depending on the `typing` module
