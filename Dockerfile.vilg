@@ -99,3 +99,22 @@ WORKDIR /app
 
 # Add pointnet2 to PYTHONPATH
 ENV PYTHONPATH="${PYTHONPATH}:/app/models/graspnet:/usr/local/lib/python3.8/dist-packages"
+
+# New stage for OpenGL support
+FROM final AS final_with_opengl
+
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    freeglut3-dev \
+    mesa-common-dev \
+    libglfw3-dev \
+    libglew-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variable for NVIDIA OpenGL
+ENV __NV_PRIME_RENDER_OFFLOAD=1
+ENV __GLX_VENDOR_LIBRARY_NAME=nvidia
+
+# Set the working directory
+WORKDIR /app

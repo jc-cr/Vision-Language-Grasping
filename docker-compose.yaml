@@ -10,16 +10,18 @@ services:
       - ./:/output
     environment:
       - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+
   vilg:
     build:
       context: .
       dockerfile: Dockerfile.vilg
-      target: final
+      target: final_with_opengl
     image: vision-language-grasping-final
     container_name: vilg-app
     environment:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
       - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
       - PYTHONPATH=/app:/app/models/graspnet:/app/models/graspnet/pointnet2:/app/models/graspnet/pointnet2/build/lib.linux-x86_64-cpython-38:/app/models/graspnet/knn:/usr/local/lib/python3.8/dist-packages
       - QT_X11_NO_MITSHM=1
@@ -37,6 +39,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    runtime: nvidia
     command: >
       bash -c "
       echo 'Debug output:' &&
