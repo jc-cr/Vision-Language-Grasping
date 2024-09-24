@@ -44,36 +44,33 @@ FROM base AS builder
 
 WORKDIR /app
 
-# Copy the entire project
-COPY . .
-
-# Copy the pre-compiled requirements
+# Copy only the requirements file first to leverage Docker cache
 COPY consolidated_requirements.txt .
 
 # Install setuptools explicitly first
 RUN pip3 install setuptools==66.0.0
 
+
 # Install pre-compiled requirements
 RUN pip3 install --no-cache-dir -r consolidated_requirements.txt
 
-RUN pip install --force-reinstall pybullet==3.2.5
-
-
-# Return to the app directory
-WORKDIR /app
+RUN pip install pybullet==3.2.5
 
 # Final stage
-FROM builder AS final
+FROM base AS final
+
+# Copy the installed packages from the builder stage
+COPY --from=builder /usr/local /usr/local
+
+# Copy the entire project
+COPY . /app
+
+WORKDIR /app
 
 # Compile pointnet2 extensions
-WORKDIR /app/models/graspnet/pointnet2
-RUN python3 setup.py build_ext --inplace
+RUN cd /app/models/graspnet/pointnet2 && python3 setup.py build_ext --inplace
 
 # Compile knn extensions
-WORKDIR /app/models/graspnet/knn
-RUN python3 setup.py build_ext --inplace
-# Copy the installed packages and project files from the builder stage
-COPY --from=builder /usr/local /usr/local
-COPY --from=builder /app /app
+RUN cd /app/models/graspnet/knn && python3 setup.py build_ext --inplace
 
 WORKDIR /app
