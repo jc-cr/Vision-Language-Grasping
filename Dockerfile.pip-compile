@@ -30,4 +30,4 @@ COPY consolidated_requirements.in .
 # Run pip-compile with PyTorch index
 CMD pip-compile --generate-hashes --output-file /output/consolidated_requirements.txt \
     --find-links https://download.pytorch.org/whl/cu111/torch_stable.html \
-    consolidated_requirements.in --verbose
+    consolidated_requirements.in --verbose --allow-unsafe
