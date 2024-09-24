@@ -7,7 +7,10 @@ from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 import glob
 import os
-ROOT = os.path.dirname(os.path.abspath(__file__))
+# Hard code the ROOT path for Docker
+ROOT = "/app/models/graspnet/pointnet2/"
+
+print("ROOT: ", ROOT)
 
 _ext_src_root = "_ext_src"
 _ext_sources = glob.glob("{}/src/*.cpp".format(_ext_src_root)) + glob.glob(
@@ -31,3 +34,4 @@ setup(
         'build_ext': BuildExtension
     }
 )
+

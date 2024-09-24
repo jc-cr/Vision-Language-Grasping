@@ -76,5 +76,4 @@ ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 RUN cd /app/models/graspnet/pointnet2 && python setup.py install
 RUN cd /app/models/graspnet/knn && python setup.py install
 
-
 WORKDIR /app

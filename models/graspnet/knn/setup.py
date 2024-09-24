@@ -14,7 +14,8 @@ requirements = ["torch", "torchvision"]
 
 
 def get_extensions():
-    this_dir = os.path.dirname(os.path.abspath(__file__))
+    # Hard code the ROOT path for Docker
+    this_dir = "/app/models/graspnet/knn"
     extensions_dir = os.path.join(this_dir, "src")
 
     main_file = glob.glob(os.path.join(extensions_dir, "*.cpp"))
