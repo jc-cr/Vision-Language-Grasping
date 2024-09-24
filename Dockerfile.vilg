@@ -82,9 +82,8 @@ RUN apt-get update && apt-get install -y \
     cuda-nvprof-11-1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Ensure the pointnet2 directory has the correct permissions
-RUN mkdir -p /app/models/graspnet/pointnet2 && \
-    chmod -R 777 /app/models/graspnet/pointnet2
+# Set permissions for the entire app directory
+RUN chmod -R 777 /app
 
 # Build and install pointnet2 extension with verbose output
 RUN cd /app/models/graspnet/pointnet2 && \
