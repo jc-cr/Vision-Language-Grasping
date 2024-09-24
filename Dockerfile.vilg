@@ -78,9 +78,9 @@ RUN python -c "import torch; print(torch.cuda.is_available())" > /tmp/torch_cuda
 
 RUN chmod -R 777 /app
 
-# Install pointnet2
+# Build and install pointnet2
 RUN cd /app/models/graspnet/pointnet2 && \
-    python setup.py build_ext --inplace && \
+    python setup.py build && \
     python setup.py install
 
 # Install knn
@@ -91,4 +91,4 @@ RUN cd /app/models/graspnet/knn && \
 WORKDIR /app
 
 # Add pointnet2 to PYTHONPATH
-ENV PYTHONPATH="${PYTHONPATH}:/app/models/graspnet"
+ENV PYTHONPATH="${PYTHONPATH}:/app/models/graspnet:/usr/local/lib/python3.8/dist-packages"
