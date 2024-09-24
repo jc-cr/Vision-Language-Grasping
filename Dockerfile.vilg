@@ -72,16 +72,6 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
-# Create necessary directories and set permissions
-RUN mkdir -p /app/models/graspnet/pointnet2/_ext_src/include && \
-    mkdir -p /app/models/graspnet/pointnet2/pointnet2 && \
-    chmod -R 777 /app/models/graspnet/pointnet2
-
-# Copy header files if they exist
-RUN if [ -d "/app/models/graspnet/pointnet2/_ext_src/src" ]; then \
-        find /app/models/graspnet/pointnet2/_ext_src/src -name "*.h" -exec cp {} /app/models/graspnet/pointnet2/_ext_src/include/ \; ; \
-    fi
-
 # Compile pointnet2 extensions
 RUN cd /app/models/graspnet/pointnet2 && \
     if [ -f "setup.py" ]; then \
@@ -90,11 +80,6 @@ RUN cd /app/models/graspnet/pointnet2 && \
         echo "setup.py not found in pointnet2 directory"; \
     fi
 
-
-# Create necessary directories and set permissions for knn
-RUN mkdir -p /app/models/graspnet/knn/knn_pytorch && \
-    chmod -R 777 /app/models/graspnet/knn
-
 # Compile knn extensions
 RUN cd /app/models/graspnet/knn && \
     if [ -f "setup.py" ]; then \
@@ -102,5 +87,8 @@ RUN cd /app/models/graspnet/knn && \
     else \
         echo "setup.py not found in knn directory"; \
     fi
+
+# Set PYTHONPATH
+ENV PYTHONPATH=/app:$PYTHONPATH
 
 WORKDIR /app
