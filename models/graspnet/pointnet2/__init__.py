@@ -6,13 +6,7 @@ print(f"Contents of current directory: {os.listdir()}")
 print(f"Contents of parent directory: {os.listdir('..')}")
 
 # Add the current directory to sys.path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
 
-try:
-    print(f"Attempting to import _ext from {os.path.abspath('.')}")
-    from . import _ext
-    print("Successfully imported _ext")
-except ImportError as e:
-    print(f"Failed to import _ext module: {e}")
-    print(f"sys.path: {sys.path}")
-    raise
+print(f"Pointnet2 directory contents: {os.listdir(current_dir)}")

@@ -22,15 +22,24 @@ try:
 except:
     import __builtin__ as builtins
 
+import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
 try:
-    import pointnet2._ext as _ext
-except ImportError:
-    if not getattr(builtins, "__POINTNET2_SETUP__", False):
-        raise ImportError(
-            "Could not import _ext module.\n"
-            "Please see the setup instructions in the README: "
-            "https://github.com/erikwijmans/Pointnet2_PyTorch/blob/master/README.rst"
-        )
+    import _ext
+except ImportError as e:
+    print(f"Error importing _ext in pointnet2_utils.py: {e}")
+    print(f"Current directory: {current_dir}")
+    print(f"Directory contents: {os.listdir(current_dir)}")
+    raise ImportError(
+        "Could not import _ext module.\n"
+        "Please see the setup instructions in the README: "
+        "https://github.com/erikwijmans/Pointnet2_PyTorch/blob/master/README.rst"
+    ) from e
 
 if False:
     # Workaround for type hints without depending on the `typing` module
