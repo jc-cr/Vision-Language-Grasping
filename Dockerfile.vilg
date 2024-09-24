@@ -92,13 +92,3 @@ WORKDIR /app
 
 # Add pointnet2 to PYTHONPATH
 ENV PYTHONPATH="${PYTHONPATH}:/app/models/graspnet:/usr/local/lib/python3.8/dist-packages"
-
-# Create a debug script
-RUN echo '#!/bin/bash\n\
-python -c "import sys; print(sys.path)"\n\
-python -c "import pointnet2; print(pointnet2.__file__)"\n\
-python -c "from pointnet2 import _ext; print(_ext.__file__)"\n\
-ls -R /app/models/graspnet/pointnet2\n\
-ls -R /usr/local/lib/python3.8/dist-packages/pointnet2*\n\
-cat /app/models/graspnet/pointnet2/__init__.py\n\
-' > /app/debug.sh && chmod +x /app/debug.sh
