@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  pip-compile:
+    build:
+      context: .
+      dockerfile: Dockerfile.pip-compile
+    volumes:
+      - ./:/app
+      - ./:/output
+    environment:
+      - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
   vilg:
     build:
       context: .
@@ -12,6 +21,7 @@ services:
       - ./:/app
       - ./assets:/app/assets
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - debug_output:/debug_output
     environment:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
@@ -26,21 +36,28 @@ services:
               capabilities: [gpu]
     command: >
       sh -c "
-      echo 'Python version:' && python --version &&
-      echo 'Pip list:' && pip list &&
-      echo 'PYTHONPATH:' && echo $$PYTHONPATH &&
-      echo 'Contents of /app/models/graspnet/pointnet2:' && ls -R /app/models/graspnet/pointnet2 &&
-      cd /app/models/graspnet/pointnet2 &&
-      cd /app &&
-      echo 'Running test.py:' && python3 scripts/test.py
+      echo 'Python version:' > /debug_output/debug.log &&
+      python --version >> /debug_output/debug.log 2>&1 &&
+      echo 'Pip list:' >> /debug_output/debug.log &&
+      pip list >> /debug_output/debug.log 2>&1 &&
+      echo 'PYTHONPATH:' >> /debug_output/debug.log &&
+      echo $$PYTHONPATH >> /debug_output/debug.log &&
+      echo 'Contents of /app/models/graspnet/pointnet2:' >> /debug_output/debug.log &&
+      ls -R /app/models/graspnet/pointnet2 >> /debug_output/debug.log 2>&1 &&
+      echo 'PyTorch version:' >> /debug_output/debug.log &&
+      python -c 'import torch; print(torch.__version__)' >> /debug_output/debug.log 2>&1 &&
+      echo 'CUDA available:' >> /debug_output/debug.log &&
+      python -c 'import torch; print(torch.cuda.is_available())' >> /debug_output/debug.log 2>&1 &&
+      echo 'Building pointnet2:' >> /debug_output/debug.log &&
+      cd /app/models/graspnet/pointnet2 && python setup.py install >> /debug_output/debug.log 2>&1 &&
+      echo 'Importing pointnet2:' >> /debug_output/debug.log &&
+      python -c 'import pointnet2._ext as _ext; print(_ext)' >> /debug_output/debug.log 2>&1 ||
+      (echo 'Import failed. Error trace:' >> /debug_output/debug.log &&
+      python -c 'import traceback; import pointnet2._ext as _ext' >> /debug_output/debug.log 2>&1) &&
+      echo 'LD_LIBRARY_PATH:' >> /debug_output/debug.log &&
+      echo $$LD_LIBRARY_PATH >> /debug_output/debug.log &&
+      echo 'Finding libc10.so:' >> /debug_output/debug.log &&
+      find / -name 'libc10.so' >> /debug_output/debug.log 2>&1 &&
+      echo 'Debug complete.' >> /debug_output/debug.log &&
+      tail -f /dev/null
       "
-
-  pip-compile:
-    build:
-      context: .
-      dockerfile: Dockerfile.pip-compile
-    volumes:
-      - ./:/app
-      - ./:/output
-    environment:
-      - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True

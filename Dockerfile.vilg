@@ -65,6 +65,7 @@ WORKDIR /app
 # Set up CUDA environment variables
 ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
+
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib/python3.8/dist-packages/torch/lib"
 
 RUN apt-get update && apt-get install -y \
@@ -72,20 +73,27 @@ RUN apt-get update && apt-get install -y \
     cuda-libraries-11-1 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python -c "import torch; print(torch.__version__)"
-RUN python -c "import torch; print(torch.cuda.is_available())"
+RUN python -c "import torch; print(torch.__version__)" > /tmp/torch_version.log 2>&1
+RUN python -c "import torch; print(torch.cuda.is_available())" > /tmp/torch_cuda.log 2>&1
 
 RUN chmod -R 777 /app
 
-RUN cd /app/models/graspnet/pointnet2 && python setup.py install --verbose 
+RUN cd /app/models/graspnet/pointnet2 && python setup.py install --verbose > /tmp/pointnet2_install.log 2>&1
 
-RUN ls -l /app/models/graspnet/pointnet2/build
-RUN ls -l /app/models/graspnet/pointnet2/build/lib*
+RUN ls -l /app/models/graspnet/pointnet2/build > /tmp/pointnet2_build.log 2>&1
+RUN ls -l /app/models/graspnet/pointnet2/build/lib* > /tmp/pointnet2_lib.log 2>&1 || echo "No lib directory found" > /tmp/pointnet2_lib.log
 
-RUN ldconfig -p | grep libc10.so
-RUN find / -name "libc10.so" 2>/dev/null
+RUN ldconfig -p > /tmp/ldconfig.log 2>&1
+RUN find / -name "libc10.so" > /tmp/find_libc10.log 2>&1
 
-RUN python -c "import sys; import pointnet2._ext as _ext; print(_ext); print(sys.path); print(sys.modules.keys())" || (echo "Import failed. Error trace:" && python -c "import traceback; import pointnet2._ext as _ext" 2>&1 | tee /tmp/error.log && cat /tmp/error.log)
+RUN python -c "import sys; import pointnet2._ext as _ext; print(_ext); print(sys.path); print(sys.modules.keys())" > /tmp/pointnet2_import.log 2>&1 || (echo "Import failed. Error trace:" && python -c "import traceback; import pointnet2._ext as _ext" 2>&1 | tee /tmp/pointnet2_error.log)
+
+# Combine all logs into one file for easier access
+RUN cat /tmp/*.log > /tmp/debug_output.log
+
+# Copy the debug output to a volume that persists after build
+VOLUME /debug_output
+RUN cp /tmp/debug_output.log /debug_output/
 
 # Build and install knn extension
 RUN cd /app/models/graspnet/knn && python setup.py install --verbose
