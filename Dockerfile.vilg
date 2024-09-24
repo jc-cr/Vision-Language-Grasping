@@ -92,8 +92,11 @@ RUN python -c "import sys; import pointnet2._ext as _ext; print(_ext); print(sys
 RUN cat /tmp/*.log > /tmp/debug_output.log
 
 # Copy the debug output to a volume that persists after build
-VOLUME /debug_output
+RUN mkdir -p /debug_output
 RUN cp /tmp/debug_output.log /debug_output/
+
+# Declare the volume after copying the file
+VOLUME /debug_output
 
 # Build and install knn extension
 RUN cd /app/models/graspnet/knn && python setup.py install --verbose

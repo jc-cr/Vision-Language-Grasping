@@ -21,7 +21,7 @@ services:
       - ./:/app
       - ./assets:/app/assets
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - debug_output:/debug_output
+      - vilg_debug:/debug_output
     environment:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
@@ -62,4 +62,4 @@ services:
       tail -f /dev/null
       "
 volumes:
-  debug_output:
+  vilg_debug:
