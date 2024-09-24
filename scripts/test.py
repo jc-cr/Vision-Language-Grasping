@@ -1,3 +1,15 @@
+import sys
+import os
+
+# Add the project root directory to the Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
+
+print(f"Python path: {sys.path}")
+print(f"Current working directory: {os.getcwd()}")
+print(f"Contents of current directory: {os.listdir('.')}")
+print(f"Contents of parent directory: {os.listdir('..')}")
+
 import argparse
 import numpy as np
 import random

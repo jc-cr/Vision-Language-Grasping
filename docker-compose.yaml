@@ -23,7 +23,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    command: python3 scripts/test.py --load_model --model_path '/app/trained_model.pth'
+    command: sh -c "cd /app && python3 scripts/test.py"
 
   pip-compile:
     build:

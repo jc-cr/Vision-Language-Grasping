@@ -5,6 +5,7 @@
 
 from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+from torch.utils.cpp_extension import CUDA_HOME
 import glob
 import os
 
@@ -27,10 +28,10 @@ setup(
                 "nvcc": [
                     "-O2", 
                     "-I{}".format("{}/{}/include".format(ROOT, _ext_src_root)),
-                    "-I{}".format(os.path.join(os.environ.get('CUDA_HOME', '/usr/local/cuda'), 'include'))
+                    "-I{}".format(os.path.join(CUDA_HOME, 'include'))
                 ],
             },
-            include_dirs=[os.path.join(os.environ.get('CUDA_HOME', '/usr/local/cuda'), 'include')]
+            include_dirs=[os.path.join(CUDA_HOME, 'include')]
         )
     ],
     cmdclass={
