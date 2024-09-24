@@ -85,7 +85,7 @@ RUN echo "Contents of /app/models/graspnet/pointnet2:" && \
 # Compile pointnet2 extensions
 RUN cd /app/models/graspnet/pointnet2 && \
     if [ -f "setup.py" ]; then \
-        python3 setup.py build_ext --inplace; \
+        TORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST} python3 setup.py build_ext --inplace; \
     else \
         echo "setup.py not found in pointnet2 directory"; \
     fi
@@ -93,7 +93,7 @@ RUN cd /app/models/graspnet/pointnet2 && \
 # Compile knn extensions
 RUN cd /app/models/graspnet/knn && \
     if [ -f "setup.py" ]; then \
-        python3 setup.py build_ext --inplace; \
+        TORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST} python3 setup.py build_ext --inplace; \
     else \
         echo "setup.py not found in knn directory"; \
     fi

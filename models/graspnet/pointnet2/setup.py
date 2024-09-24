@@ -20,13 +20,18 @@ setup(
                 "nvcc": [
                     "-O2", 
                     "-I{}".format(os.path.join(os.path.dirname(os.path.abspath(__file__)), _ext_src_root, "include")),
-                    "-I{}".format(os.path.join(os.environ.get('CUDA_HOME', '/usr/local/cuda'), 'include'))
+                    "-I{}".format(os.path.join(os.environ.get('CUDA_HOME', '/usr/local/cuda'), 'include')),
+                    "-DTORCH_EXTENSION_NAME=pointnet2._ext",
+                    "-D_GLIBCXX_USE_CXX11_ABI=0",
                 ],
             },
-            include_dirs=[os.path.join(os.environ.get('CUDA_HOME', '/usr/local/cuda'), 'include')]
+            include_dirs=[
+                os.path.join(os.environ.get('CUDA_HOME', '/usr/local/cuda'), 'include'),
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), _ext_src_root, "include")
+            ]
         )
     ],
     cmdclass={
-        'build_ext': BuildExtension
+        'build_ext': BuildExtension.with_options(use_ninja=False)
     }
 )
