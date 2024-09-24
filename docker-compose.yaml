@@ -16,6 +16,7 @@ services:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
       - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+      - PYTHONPATH=/app:/app/models/graspnet/pointnet2:/app/models/graspnet/knn
     deploy:
       resources:
         reservations:

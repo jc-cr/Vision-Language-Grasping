@@ -90,7 +90,6 @@ RUN cd /app/models/graspnet/pointnet2 && \
         echo "setup.py not found in pointnet2 directory"; \
     fi
 
-
 # Create necessary directories and set permissions for knn
 RUN mkdir -p /app/models/graspnet/knn/knn_pytorch && \
     chmod -R 777 /app/models/graspnet/knn
