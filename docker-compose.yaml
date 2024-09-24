@@ -61,3 +61,5 @@ services:
       echo 'Debug complete.' >> /debug_output/debug.log &&
       tail -f /dev/null
       "
+volumes:
+  debug_output:
