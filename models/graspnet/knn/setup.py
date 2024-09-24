@@ -1,3 +1,4 @@
+# knn/setup.py
 #!/usr/bin/env python
 
 import glob
