@@ -5,10 +5,12 @@
 *.npz
 **/.vscode/**
 **/grasp_label*/**
+**/log*/**
 **/dump*/**
 **/build/**
 *.o
 *.so
 *.egg
 **/*.egg-info/**
+logs
 dataset/tolerance

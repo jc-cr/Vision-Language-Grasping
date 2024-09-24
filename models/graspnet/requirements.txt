@@ -1,6 +1,7 @@
-# graspnet requirements
-tensorboard
+torch==1.6
+tensorboard==2.3
+numpy
 scipy
-open3d
+open3d>=0.8
 Pillow
 tqdm

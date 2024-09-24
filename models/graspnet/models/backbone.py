@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(ROOT_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'pointnet2'))
 
-from ..pointnet2.pointnet2_modules import PointnetSAModuleVotes, PointnetFPModule
+from pointnet2_modules import PointnetSAModuleVotes, PointnetFPModule
 
 class Pointnet2Backbone(nn.Module):
     r"""
@@ -121,7 +121,6 @@ class Pointnet2Backbone(nn.Module):
         end_points['sa4_features'] = features
 
         # --------- 2 FEATURE UPSAMPLING LAYERS --------
-
         features = self.fp1(end_points['sa3_xyz'], end_points['sa4_xyz'], end_points['sa3_features'], end_points['sa4_features'])
         features = self.fp2(end_points['sa2_xyz'], end_points['sa3_xyz'], end_points['sa2_features'], features)
         end_points['fp2_features'] = features

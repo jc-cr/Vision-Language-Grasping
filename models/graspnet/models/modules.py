@@ -14,9 +14,9 @@ sys.path.append(ROOT_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'pointnet2'))
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 
-from ..pointnet2 import pytorch_utils as pt_utils
-from ..pointnet2.pointnet2_utils import CylinderQueryAndGroup
-from ..utils.loss_utils import generate_grasp_views, batch_viewpoint_params_to_matrix
+import pytorch_utils as pt_utils
+from pointnet2_utils import CylinderQueryAndGroup
+from loss_utils import generate_grasp_views, batch_viewpoint_params_to_matrix
 
 
 class ApproachNet(nn.Module):
@@ -228,9 +228,5 @@ class ToleranceNet(nn.Module):
         vp_features = F.relu(self.bn2(self.conv2(vp_features)), inplace=True)
         vp_features = self.conv3(vp_features)
         vp_features = vp_features.view(B, -1, num_seed, num_depth)
-        # if not end_points.has_key('grasp_tolerance_pred'):
-        end_points['grasp_tolerance_pred'] = vp_features  # for initial pose
-        # else:
-        #     end_points['grasp_tolerance_pred_target'] = vp_features  # for target pose
-        
+        end_points['grasp_tolerance_pred'] = vp_features
         return end_points

@@ -9,7 +9,10 @@ import time
 import argparse
 import multiprocessing as mp
 
-from ..utils.data_utils import compute_point_dists
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BASE_DIR)
+sys.path.append(os.path.join(ROOT_DIR, 'utils'))
+from data_utils import compute_point_dists
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_root', required=True, help='Dataset root')

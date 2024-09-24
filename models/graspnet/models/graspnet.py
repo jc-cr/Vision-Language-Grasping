@@ -9,11 +9,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .backbone import Pointnet2Backbone
-from .modules import ApproachNet, CloudCrop, OperationNet, ToleranceNet
-from .loss import get_loss
-from ..utils.loss_utils import GRASP_MAX_WIDTH, GRASP_MAX_TOLERANCE
-from ..utils.label_generation import process_grasp_labels, match_grasp_view_and_label, batch_viewpoint_params_to_matrix
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(BASE_DIR)
+sys.path.append(ROOT_DIR)
+sys.path.append(os.path.join(ROOT_DIR, 'pointnet2'))
+sys.path.append(os.path.join(ROOT_DIR, 'utils'))
+
+from backbone import Pointnet2Backbone
+from modules import ApproachNet, CloudCrop, OperationNet, ToleranceNet
+from loss import get_loss
+from loss_utils import GRASP_MAX_WIDTH, GRASP_MAX_TOLERANCE
+from label_generation import process_grasp_labels, match_grasp_view_and_label, batch_viewpoint_params_to_matrix
 
 
 class GraspNetStage1(nn.Module):
@@ -25,7 +31,6 @@ class GraspNetStage1(nn.Module):
     def forward(self, end_points):
         pointcloud = end_points['point_clouds']
         seed_features, seed_xyz, end_points = self.backbone(pointcloud, end_points)
-        
         end_points = self.vpmodule(seed_xyz, seed_features, end_points)
         return end_points
 
@@ -79,10 +84,9 @@ def pred_decode(end_points):
         grasp_center = end_points['fp2_xyz'][i].float()
         approaching = -end_points['grasp_top_view_xyz'][i].float()
         grasp_angle_class_score = end_points['grasp_angle_cls_pred'][i]
-        grasp_width = 10.0 * end_points['grasp_width_pred'][i]
+        grasp_width = 1.2 * end_points['grasp_width_pred'][i]
         grasp_width = torch.clamp(grasp_width, min=0, max=GRASP_MAX_WIDTH)
         grasp_tolerance = end_points['grasp_tolerance_pred'][i]
-        # grasp_tolerance_target = end_points['grasp_tolerance_pred_target'][i]
 
         ## slice preds by angle
         # grasp angle
@@ -93,7 +97,6 @@ def pred_decode(end_points):
         grasp_score = torch.gather(grasp_score, 0, grasp_angle_class_).squeeze(0)
         grasp_width = torch.gather(grasp_width, 0, grasp_angle_class_).squeeze(0)
         grasp_tolerance = torch.gather(grasp_tolerance, 0, grasp_angle_class_).squeeze(0)
-        # grasp_tolerance_target = torch.gather(grasp_tolerance_target, 0, grasp_angle_class_).squeeze(0)
 
         ## slice preds by score/depth
         # grasp depth
@@ -104,7 +107,6 @@ def pred_decode(end_points):
         grasp_angle = torch.gather(grasp_angle, 1, grasp_depth_class)
         grasp_width = torch.gather(grasp_width, 1, grasp_depth_class)
         grasp_tolerance = torch.gather(grasp_tolerance, 1, grasp_depth_class)
-        # grasp_tolerance_target = torch.gather(grasp_tolerance_target, 1, grasp_depth_class)
 
         ## slice preds by objectness
         objectness_pred = torch.argmax(objectness_score, 0)
@@ -117,13 +119,6 @@ def pred_decode(end_points):
         grasp_center = grasp_center[objectness_mask]
         grasp_tolerance = grasp_tolerance[objectness_mask]
         grasp_score = grasp_score * grasp_tolerance / GRASP_MAX_TOLERANCE
-        
-        # CHANGE ME!!!!!!!!!!!!!!!!!!
-        # measure grasps on initial pose with tolreance of target pose
-        # grasp_tolerance_target = grasp_tolerance_target[objectness_mask]
-        # grasp_score_target = grasp_score * grasp_tolerance_target / GRASP_MAX_TOLERANCE
-        # grasp_score = torch.min(grasp_score, grasp_score_target)
-
 
         ## convert to rotation matrix
         Ns = grasp_angle.size(0)

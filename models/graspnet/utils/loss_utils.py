@@ -5,7 +5,7 @@
 import torch
 import numpy as np
 
-GRASP_MAX_WIDTH = 0.075
+GRASP_MAX_WIDTH = 0.1
 GRASP_MAX_TOLERANCE = 0.05
 THRESH_GOOD = 0.7
 THRESH_BAD = 0.1
