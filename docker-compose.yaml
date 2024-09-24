@@ -23,6 +23,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - vilg_debug:/debug_output
       - ./models/graspnet/pointnet2/build/lib.linux-x86_64-cpython-38/pointnet2:/app/models/graspnet/pointnet2/build/lib.linux-x86_64-cpython-38/pointnet2
+      - ./models/graspnet/pointnet2:/app/models/graspnet/pointnet2
     environment:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
