@@ -72,18 +72,9 @@ ENV CUDA_HOME=/usr/local/cuda
 ENV PATH=${CUDA_HOME}/bin:${PATH}
 ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
 
-# Install build essentials and Python dev
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    python3-dev
-
 # Build and install pointnet2 extension
-RUN cd /app/models/graspnet/pointnet2 && \
-    python3 setup.py build_ext --inplace && \
-    python3 setup.py install
+RUN cd /app/models/graspnet/pointnet2 && python setup.py install
+RUN cd /app/models/graspnet/knn && python setup.py install
 
-# Install the local packages
-RUN pip install -e /app/models/graspnet/pointnet2
-RUN pip install -e /app/models/graspnet/knn
 
 WORKDIR /app
