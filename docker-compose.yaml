@@ -35,14 +35,13 @@ services:
               count: all
               capabilities: [gpu]
     command: >
-      sh -c "
-      echo 'Starting debug...' > /debug_output/debug.log &&
-      python --version >> /debug_output/debug.log 2>&1 &&
-      pip list >> /debug_output/debug.log 2>&1 &&
-      echo $$PYTHONPATH >> /debug_output/debug.log &&
-      ls -R /app/models/graspnet/pointnet2 >> /debug_output/debug.log 2>&1 &&
-      python -c 'import torch; print(torch.__version__, torch.cuda.is_available())' >> /debug_output/debug.log 2>&1 &&
-      echo 'Debug complete. Starting main script...' >> /debug_output/debug.log &&
+      bash -c "
+      echo 'Python path:' &&
+      python -c 'import sys; print(sys.path)' &&
+      echo 'Pointnet2 location:' &&
+      python -c 'import pointnet2; print(pointnet2.__file__)' &&
+      echo 'Pointnet2._ext location:' &&
+      python -c 'from pointnet2 import _ext; print(_ext.__file__)' &&
       python3 scripts/test.py
       "
 volumes:
