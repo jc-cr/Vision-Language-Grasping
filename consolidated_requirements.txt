@@ -7,7 +7,8 @@
 --find-links https://download.pytorch.org/whl/cu111/torch_stable.html
 
 setuptools==58.2.0 \
-    --hash=sha256:0
+    --hash=sha256:2551203ae6955b9876741a26ab3e767bb3242dafe86a32a749ea0d78b6792f11
+
 
 pybullet==3.2.5 \
     --hash=sha256:0
