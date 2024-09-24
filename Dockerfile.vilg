@@ -86,9 +86,7 @@ RUN apt-get update && apt-get install -y \
 RUN chmod -R 777 /app
 
 # Build and install pointnet2 extension with verbose output
-RUN cd /app/models/graspnet/pointnet2 && \
-    python setup.py build_ext --inplace -v && \
-    python setup.py install -v
+RUN cd /app/models/graspnet/pointnet2 && python setup.py install --verbose
 
 # Check the built extension
 RUN cd /app/models/graspnet/pointnet2 && \

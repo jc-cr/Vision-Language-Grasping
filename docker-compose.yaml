@@ -12,7 +12,6 @@ services:
       - ./:/app
       - ./assets:/app/assets
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - pointnet2_build:/app/models/graspnet/pointnet2/build
     environment:
       - DISPLAY=${DISPLAY}
       - NVIDIA_VISIBLE_DEVICES=all
@@ -48,6 +47,3 @@ services:
       - ./:/output
     environment:
       - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
-  
-  volumes:
-    pointnet2_build:
