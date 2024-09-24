@@ -13,10 +13,12 @@ _ext_sources = glob.glob("{}/src/*.cpp".format(_ext_src_root)) + glob.glob(
 )
 _ext_headers = glob.glob("{}/include/*".format(_ext_src_root))
 
-print("Source files:", _ext_sources)
-print("Header files:", _ext_headers)
 
 def get_extensions():
+    print("Current working directory:", os.getcwd())
+    print("ROOT:", ROOT)
+    print("_ext_sources:", _ext_sources)
+    print("_ext_headers:", _ext_headers)
     ext_modules = [
         CUDAExtension(
             name='pointnet2._ext',
