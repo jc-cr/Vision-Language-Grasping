@@ -29,7 +29,6 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
       - PYTHONPATH=/app:/app/models/graspnet:/app/models/graspnet/pointnet2:/app/models/graspnet/knn:/usr/local/lib/python3.8/dist-packages
-      - PYTHONVERBOSE=1
     deploy:
       resources:
         reservations:
