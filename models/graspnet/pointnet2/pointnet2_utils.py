@@ -24,43 +24,49 @@ except:
 
 import os
 import sys
+import importlib.util
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
+print(f"Current directory: {current_dir}")
+print(f"Directory contents: {os.listdir(current_dir)}")
+print(f"sys.path: {sys.path}")
+
+# Try to find the .so file
+so_files = [f for f in os.listdir(current_dir) if f.endswith('.so')]
+print(f"Found .so files: {so_files}")
+
+if so_files:
+    so_file = so_files[0]
+    so_path = os.path.join(current_dir, so_file)
+    print(f"Trying to load: {so_path}")
+    try:
+        spec = importlib.util.spec_from_file_location("_ext", so_path)
+        _ext = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_ext)
+        print(f"Successfully loaded {so_file}")
+    except Exception as e:
+        print(f"Failed to load {so_file}: {e}")
+else:
+    print("No .so files found in the current directory")
+
 try:
     from pointnet2 import _ext
+    print("Successfully imported pointnet2._ext")
 except ImportError as e:
-    print(f"Error importing pointnet2._ext in pointnet2_utils.py: {e}")
-    print(f"Current directory: {current_dir}")
-    print(f"Directory contents: {os.listdir(current_dir)}")
-    print(f"sys.path: {sys.path}")
-    
-    # Try to import _ext directly
+    print(f"Error importing pointnet2._ext: {e}")
     try:
         import _ext
         print("Successfully imported _ext directly")
     except ImportError as e2:
         print(f"Error importing _ext directly: {e2}")
-        
-        # Check if the .so file exists
-        so_file = '_ext.cpython-38-x86_64-linux-gnu.so'
-        if so_file in os.listdir(current_dir):
-            print(f"{so_file} exists in the current directory")
-            # Try to load it manually
-            import importlib.util
-            spec = importlib.util.spec_from_file_location("_ext", os.path.join(current_dir, so_file))
-            _ext = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(_ext)
-            print("Successfully loaded _ext manually")
-        else:
-            print(f"{so_file} does not exist in the current directory")
-            raise ImportError(
-                "Could not import _ext module.\n"
-                "Please see the setup instructions in the README: "
-                "https://github.com/erikwijmans/Pointnet2_PyTorch/blob/master/README.rst"
-            ) from e
+        raise ImportError(
+            "Could not import _ext module.\n"
+            "Please see the setup instructions in the README: "
+            "https://github.com/erikwijmans/Pointnet2_PyTorch/blob/master/README.rst"
+        ) from e
 
 if False:
     # Workaround for type hints without depending on the `typing` module
